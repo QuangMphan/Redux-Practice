@@ -1,13 +1,25 @@
 import { Fragment } from 'react/jsx-runtime'
-import { useGetPostsQuery } from '../../blog.service'
+import { useDeletePostMutation, useGetPostsQuery } from '../../blog.service'
 import PostItem from '../PostItem'
 import SkeletonPost from '../SkeletonPost'
+import { useDispatch } from 'react-redux'
+import { startEditPost } from '../../blog.slice'
 
 export default function PostList() {
     // isLoading is for the first fetch
     // isFetching is for every api call
-    const { data, isLoading, isFetching } = useGetPostsQuery()
-    console.log(data, isLoading, isFetching)
+    const { data, isFetching } = useGetPostsQuery()
+    const [deletePost] = useDeletePostMutation()
+
+    const dispatch = useDispatch()
+
+    const startEdit = (id: string) => {
+        dispatch(startEditPost(id))
+    }
+
+    const HandleDeletePost = (id: string) => {
+        deletePost(id)
+    }
 
     return (
         <div className='bg-white py-6 sm:py-8 lg:py-12'>
@@ -28,7 +40,10 @@ export default function PostList() {
                         </Fragment>
                     )}
 
-                    {!isFetching && data?.map((post) => <PostItem key={post.id} post={post} />)}
+                    {!isFetching &&
+                        data?.map((post) => (
+                            <PostItem key={post.id} post={post} startEdit={startEdit} deletePost={HandleDeletePost} />
+                        ))}
                 </div>
             </div>
         </div>
